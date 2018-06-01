@@ -1,7 +1,7 @@
 library(readr)
 library(class)
 
-data <- read_csv("./Data_Cortex_Nuclear.csv")
+data <- read_csv("/home/junior/projects/bi/Data_Cortex_Nuclear.csv")
 data <- data[, -1]
 data$Genotype = as.integer(as.factor(data$Genotype))
 data$Treatment = as.integer(as.factor(data$Treatment))
@@ -61,11 +61,11 @@ data$P38_N[which(is.na(data$P38_N))] <- mean(data$P38_N, na.rm = TRUE)
 data$pMTOR_N[which(is.na(data$pMTOR_N))] <- mean(data$pMTOR_N, na.rm = TRUE)
 data$pP70S6_N[which(is.na(data$pP70S6_N))] <- mean(data$pP70S6_N, na.rm = TRUE)
 
+# Shuffle data
+data = data[sample(nrow(data), nrow(data)), ]
 train_data <- data[1:950, ]
 test_data <- data[951:1080, ]
 
 pred <- knn(train = train_data, test = test_data, cl = train_data$class, k = 32)
-# View(data_norm)
-View(pred)
 table(pred, test_data$class)
 
