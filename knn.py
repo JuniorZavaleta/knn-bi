@@ -6,6 +6,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
+from sklearn.naive_bayes import GaussianNB
 
 
 def visualize_tree(tree, feature_names):
@@ -52,4 +53,10 @@ knn = KNeighborsClassifier(n_neighbors=5)
 # Fit classifier
 knn.fit(X_train, y_train)
 # Predict and get accuracy score
-print('Accuracy score: ', accuracy_score(y_test, knn.predict(X_test)))
+print('KNN Accuracy score: ', accuracy_score(y_test, knn.predict(X_test)))
+
+# Create Bayes Classifier
+bayes = GaussianNB()
+# Fit classifier
+bayes.fit(X_train, y_train)
+print('Bayes Accuracy score: ', accuracy_score(y_test, bayes.predict(X_test)))
