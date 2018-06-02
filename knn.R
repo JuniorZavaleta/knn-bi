@@ -2,14 +2,17 @@ library(readr)
 library(class)
 library(e1071)
 
+# Read CSV
 data <- read_csv("/home/junior/projects/bi/Data_Cortex_Nuclear.csv")
+# Ignore ID
 data <- data[, -1]
+# Set numeric values to string values
 data$Genotype = as.integer(as.factor(data$Genotype))
 data$Treatment = as.integer(as.factor(data$Treatment))
 data$Behavior = as.integer(as.factor(data$Behavior))
 data$class = as.integer(as.factor(data$class))
 
-no_meanable <- c('class', 'Genotype', 'Treatment', 'Behavior')
+# Set the mean value to blank cells 
 data$ELK_N[which(is.na(data$ELK_N))] <- mean(data$ELK_N, na.rm = TRUE)
 data$MEK_N[which(is.na(data$MEK_N))] <- mean(data$MEK_N, na.rm = TRUE)
 data$DYRK1A_N[which(is.na(data$DYRK1A_N))] <- mean(data$DYRK1A_N, na.rm = TRUE)
@@ -69,10 +72,9 @@ test_data <- data[951:1080, ]
 
 # KNN
 knn_model <- knn(train = train_data, test = test_data, cl = train_data$class, k = 32)
-preds <- predict(model, test_data)
-table(preds, test_data$class)
+table(knn_model, test_data$class)
 
 # Bayes
 bayes_model <- naiveBayes(as.factor(class) ~ ., data = train_data)
-preds <- predict(model, test_data)
+preds <- predict(bayes_model, test_data)
 table(preds, test_data$class)
