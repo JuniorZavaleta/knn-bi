@@ -1,8 +1,30 @@
+import subprocess
 import pandas as pd
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
+
+
+def visualize_tree(tree, feature_names):
+    """Create tree png using graphviz.
+
+    Args
+    ----
+    tree -- scikit-learn DecsisionTree.
+    feature_names -- list of feature names.
+    """
+    with open("dt.dot", 'w') as f:
+        export_graphviz(tree, out_file=f, feature_names=feature_names)
+
+    command = ["dot", "-Tpng", "dt.dot", "-o", "dt.png"]
+    try:
+        subprocess.check_call(command)
+    except:
+        exit("Could not run dot, ie graphviz, to produce visualization")
+
 
 # Read csv
 df = pd.read_csv('Data_Cortex_Nuclear.csv')
@@ -15,6 +37,12 @@ x_values = X.values
 # Get the output desired
 y = df.iloc[:, 81]
 y_values = y.values
+
+# Create DT Classifier
+dt = DecisionTreeClassifier(min_samples_split=20, random_state=99)
+# Fit classifier
+dt.fit(X, y)
+visualize_tree(dt, list(X.columns.values))
 
 # Split training and test data
 X_train, X_test, y_train, y_test = train_test_split(x_values, y_values, test_size=0.20)
