@@ -1,5 +1,6 @@
 library(readr)
 library(class)
+library(e1071)
 
 data <- read_csv("/home/junior/projects/bi/Data_Cortex_Nuclear.csv")
 data <- data[, -1]
@@ -66,6 +67,12 @@ data = data[sample(nrow(data), nrow(data)), ]
 train_data <- data[1:950, ]
 test_data <- data[951:1080, ]
 
-pred <- knn(train = train_data, test = test_data, cl = train_data$class, k = 32)
-table(pred, test_data$class)
+# KNN
+knn_model <- knn(train = train_data, test = test_data, cl = train_data$class, k = 32)
+preds <- predict(model, test_data)
+table(preds, test_data$class)
 
+# Bayes
+bayes_model <- naiveBayes(as.factor(class) ~ ., data = train_data)
+preds <- predict(model, test_data)
+table(preds, test_data$class)
