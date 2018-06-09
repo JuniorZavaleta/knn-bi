@@ -2,15 +2,34 @@ library(readr)
 library(class)
 library(e1071)
 
-# Read CSV
-data <- read_csv("/home/junior/projects/bi/Data_Cortex_Nuclear.csv")
+# Function to show results
+show_results <- function(preds, test_data, algorithm) {
+  error = 0
+  for (class in unique(preds)) {
+    n_preds_class_x = length(which(preds == class))
+    n_data_class_x = length(which(test_data$class == class))
+    error_class = abs(n_preds_class_x - n_data_class_x)
+    error = error + error_class
+    print(paste("(", algorithm, ") Errores en ", classes[as.integer(class)], ": ", error_class))
+  }
+  
+  total = length(preds)
+  print(paste("Cantidad de registros de entrenamiento: ", total))
+  print(paste("Precision (", algorithm,")", (total - error)/total*100))
+}
+
+# Read CSV 
+# data <- read_csv("/home/junior/projects/bi/Data_Cortex_Nuclear.csv")
+data <- read_csv("C:/Users/preda/Documents/Data_Cortex_Nuclear.csv")
 # Ignore ID
 data <- data[, -1]
 # Set numeric values to string values
 data$Genotype = as.integer(as.factor(data$Genotype))
 data$Treatment = as.integer(as.factor(data$Treatment))
 data$Behavior = as.integer(as.factor(data$Behavior))
-data$class = as.integer(as.factor(data$class))
+classes = as.factor(data$class)
+data$class = as.integer(classes)
+classes = unique(as.character(classes))
 
 # Set the mean value to blank cells 
 data$ELK_N[which(is.na(data$ELK_N))] <- mean(data$ELK_N, na.rm = TRUE)
@@ -71,10 +90,12 @@ train_data <- data[1:950, ]
 test_data <- data[951:1080, ]
 
 # KNN
-knn_model <- knn(train = train_data, test = test_data, cl = train_data$class, k = 32)
-table(knn_model, test_data$class)
+preds_knn_model <- knn(train = train_data, test = test_data, cl = train_data$class, k = 32)
+print(table(preds_knn_model, test_data$class))
+show_results(preds = preds_knn_model, test_data = test_data, algorithm = "KNN")
 
 # Bayes
 bayes_model <- naiveBayes(as.factor(class) ~ ., data = train_data)
 preds <- predict(bayes_model, test_data)
-table(preds, test_data$class)
+print(table(preds, test_data$class))
+show_results(preds = preds, test_data = test_data, algorithm = "Bayes")
